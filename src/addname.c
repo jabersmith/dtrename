@@ -4,30 +4,27 @@ addname.c
 
 Copyright (C) 2015 John Abernathy Smith II
 
-This program is free software: you can redistribute it and/or modify
+This file is part of dtrename.
+
+dtrename is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
+dtrename is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+along with dtrename.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
 #include <stdlib.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <string.h>
-#include <errno.h>
-#include <X11/Xlib.h>
-#include <X11/Xatom.h>
 
-#include <config.h>
 #include <addname.h>
 
 
@@ -82,8 +79,11 @@ char *add_name_to_list (char *oldList, size_t oldLen,
     char *newp = NULL;
     int id;
 
-    *newLen = oldLen + strlen(newName) + 1;
-    newList = malloc(*newLen);
+    /* allocate a buffer large enough for the original list + the       */
+    /* new name.  We'll use it all in the insert case; in the overwrite */
+    /* case, we won't use it all, but we won't know exactly how much we */
+    /* need until we've finished the scan.                              */
+    newList = malloc(oldLen + strlen(newName) + 1);
     if (newList == NULL)
     {
         fprintf(stderr, "Failed to allocate memory.\n");
@@ -93,40 +93,35 @@ char *add_name_to_list (char *oldList, size_t oldLen,
     oldp = oldList;
     newp = newList;
     id = 0;
-    while (((oldp - oldList) <= oldLen) && 
-	   ((newp - newList) <= *newLen))
-    {
-	if (id == pos)
-	{
-	    strcpy(newp, newName);
-	    while (*newp != '\0')
-	      newp++;
-	    newp++;
 
-	    if (!insert)
-	    {
+    /* walk through the list, one name at a time, copying into the new list */
+    while (((oldp - oldList) < oldLen) ||
+	   (insert && (id <= pos)))
+    {
+        /* copy the appropriate name -- either the newName, if it's time   */
+        /* to do so, or the name from the original list that we've reached */
+	if (id == pos)
+	  strcpy(newp, newName);
+	else
+	  strcpy(newp, oldp);
+
+	/* advance the pointer into the new list past the name we just */
+	/* copied, including its terminating null.                     */
+	while (*newp != '\0')
+	  newp++;
+	newp++;
+
+	/* consume the old name in that position, too, except if we're */
+	/* inserting and we're currently at the insert point.          */
+	if (!insert || (id != pos))
+	{
 	      /* consume old name for this desktop */
 	      while (*oldp != '\0')
 		oldp++;
 	      oldp++;
-	    }
-	    
-	    id++;
 	}
-	else
-	{
-  	    strcpy(newp, oldp);
-
-	    while (*newp != '\0')
-	      newp++;
-	    newp++;
 	    
-	    while (*oldp != '\0')
-		oldp++;
-	    oldp++;
-
-	    id++;
-	}
+	id++;
     }
 
     *newLen = newp - newList;

@@ -7,18 +7,20 @@ an EWMH/NetWM compatible X Window Manager.
 
 Copyright (C) 2015 John Abernathy Smith II
 
-This program is free software: you can redistribute it and/or modify
+This file is part of dtrename.
+
+dtrename is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
+dtrename is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+along with dtrename.  If not, see <http://www.gnu.org/licenses/>.
 
 */
 
@@ -32,8 +34,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <config.h>
 #include <addname.h>
-
-#define MAX_PROPERTY_VALUE_LEN 4096
 
 static void usage(int status);
 
@@ -67,11 +67,13 @@ static void set_string_property (Display *disp, Window win,
 "Report bugs to: dtrename@gmail.com\n" \
 "\n"
 
+
 static void usage(int status)
 {
     fputs(HELP, stdout);
     exit(status);
 }
+
 
 static void consume_arguments(int argc, char **argv,
 			      long *pos, int *insert,
@@ -129,17 +131,12 @@ static unsigned char *get_property(Display *disp, Window win,
     
     xa_prop_name = XInternAtom(disp, name, False);
     
-    /* MAX_PROPERTY_VALUE_LEN / 4 explanation (XGetWindowProperty manpage):
-     *
-     * long_length = Specifies the length in 32-bit multiples of the
-     *               data to be retrieved.
-     */
     if (XGetWindowProperty(disp, win, xa_prop_name, 0,
 			   4096, False,
 			   xa_prop_type, &xa_ret_type, ret_format,     
 			   ret_nitems, &ret_bytes_after, &ret_prop) != Success)
     {
-        fprintf(stderr,"Cannot get %s property.\n", name);
+        fprintf(stderr,"Can't get %s property.\n", name);
         return NULL;
     }
   
@@ -193,7 +190,11 @@ static char *get_string_property (Display *disp, Window win,
     /* return a null-terminated copy, to make string handling easier */
     tmp_size = (ret_format / 8) * ret_nitems;
     ret = malloc(tmp_size + 1);
-    // TODO
+    if (ret == NULL)
+    {
+        fprintf(stderr, "Can't allocate memory.\n");
+	return NULL;
+    }
     memcpy(ret, ret_prop, tmp_size);
     ret[tmp_size] = '\0';
 
@@ -238,7 +239,7 @@ int main (int argc, char **argv)
     disp = XOpenDisplay(NULL);
     if (disp == NULL)
     {
-        fputs("Cannot open display.\n", stderr);
+        fputs("Can't open display.\n", stderr);
         exit(EXIT_FAILURE);
     }
 
@@ -249,7 +250,7 @@ int main (int argc, char **argv)
         pos = get_long_property(disp, root, "_NET_CURRENT_DESKTOP");
 	if (pos < 0)
 	{
-	  fprintf(stderr, "Cannot get current desktop property.\n");
+	  fprintf(stderr, "Can't get _NET_CURRENT_DESKTOP.\n");
 	  exit(EXIT_FAILURE);
 	}
     }
@@ -258,7 +259,7 @@ int main (int argc, char **argv)
 				  &oldLen);
     if (oldList == NULL)
     {
-        fprintf(stderr, "Cannot get desktop names property.\n");
+        fprintf(stderr, "Can't get _NET_DESKTOP_NAMES.\n");
         exit(EXIT_FAILURE);
     }
 
