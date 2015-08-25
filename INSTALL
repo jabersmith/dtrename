@@ -1,0 +1,11 @@
+This is a placeholder, for now.
+
+When/if I ever distribute this in tarball form, it would include a
+'configure' file, and all the other autoconf-generated files that
+support the common "./configure; make; make install" compile/install
+flow.
+
+But for now, I'm only publishing this as a source project, and refuse
+to check those generated files in as source.  So that flow needs to
+be proceeded by "autoreconf --install", and the environment where
+it's built needs to have a working autoconf/automake.

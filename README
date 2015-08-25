@@ -1,1 +1,12 @@
-Put some token text here
+dtrename 0.0
+
+A command-line tool to change the name of a virtual desktop in an
+EWMH/NetWM compatible X Window Manager.
+
+To compile and install dtrename, follow the instructions found in
+the top-level directory of the distribution, in the file named
+"INSTALL".
+
+dtrename is distributed under the GNU General Public License (GPL).
+The full text of the GPL is included in the top-level directory of
+the distribution, in the file named "COPYING".

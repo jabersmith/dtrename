@@ -1,4 +1,4 @@
-AC_INIT([dtrename], [0.1], [dtrename@gmail.com])
+AC_INIT([dtrename], [0.9], [jaysmith+dtrename@gmail.com])
 
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 

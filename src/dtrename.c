@@ -56,7 +56,7 @@ static void set_string_property (Display *disp, Window win,
 				 char *value, size_t size);
 
 
-#define HELP "dtrename " VERSION "\n" \
+#define HELP PACKAGE_STRING "\n" \
 "Usage: dtrename [-d POS] [-i] NAME\n" \
 "Set the name of the current virtual desktop\n" \
 "  -d          set the name of the POS'th desktop, counting\n" \
@@ -64,7 +64,7 @@ static void set_string_property (Display *disp, Window win,
 "  -i          insert a new desktop name into the current list,\n" \
 "              rather than overwriting the current desktop's name\n" \
 "\n" \
-"Report bugs to: dtrename@gmail.com\n" \
+"Report bugs to: " PACKAGE_BUGREPORT "\n" \
 "\n"
 
 
